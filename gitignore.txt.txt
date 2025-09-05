@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+venv/
+
+# IDE files
+.idea/
+.vscode/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Caches and history
+f1_cache/
+predictions_history.csv
+
+# Secrets
+.streamlit/
+secrets.toml
