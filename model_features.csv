@@ -1,0 +1,289 @@
+feature
+position_qual
+year
+driver_form_5
+team_form_5
+driver_aitken
+driver_albers
+driver_albon
+driver_alboreto
+driver_alesi
+driver_alguersuari
+driver_alonso
+driver_ambrosio
+driver_badoer
+driver_barrichello
+driver_baumgartner
+driver_bearman
+driver_beretta
+driver_berger
+driver_bernard
+driver_bernoldi
+driver_blundell
+driver_bottas
+driver_boullion
+driver_bourdais
+driver_brabham
+driver_brendon_hartley
+driver_brundle
+driver_bruni
+driver_bruno_senna
+driver_buemi
+driver_button
+driver_cesaris
+driver_chandhok
+driver_chilton
+driver_colapinto
+driver_comas
+driver_coulthard
+driver_dalmas
+driver_damon_hill
+driver_davidson
+driver_de_vries
+driver_deletraz
+driver_diniz
+driver_doohan
+driver_doornbos
+driver_enge
+driver_ericsson
+driver_firman
+driver_fisichella
+driver_fittipaldi
+driver_fontana
+driver_frentzen
+driver_friesacher
+driver_gachot
+driver_garde
+driver_gasly
+driver_gene
+driver_giovinazzi
+driver_glock
+driver_gounon
+driver_grassi
+driver_grosjean
+driver_gutierrez
+driver_hakkinen
+driver_hamilton
+driver_haryanto
+driver_heidfeld
+driver_herbert
+driver_hulkenberg
+driver_ide
+driver_inoue
+driver_irvine
+driver_jolyon_palmer
+driver_jules_bianchi
+driver_karthikeyan
+driver_katayama
+driver_kevin_magnussen
+driver_kiesa
+driver_klien
+driver_kobayashi
+driver_kovalainen
+driver_kubica
+driver_kvyat
+driver_lagorce
+driver_lamy
+driver_larini
+driver_latifi
+driver_lawson
+driver_leclerc
+driver_lehto
+driver_liuzzi
+driver_magnussen
+driver_maldonado
+driver_mansell
+driver_marques
+driver_martini
+driver_massa
+driver_matta
+driver_max_verstappen
+driver_mazepin
+driver_mazzacane
+driver_mcnish
+driver_merhi
+driver_michael_schumacher
+driver_mick_schumacher
+driver_montagny
+driver_monteiro
+driver_montermini
+driver_montoya
+driver_morbidelli
+driver_moreno
+driver_nakajima
+driver_nakano
+driver_nasr
+driver_norris
+driver_ocon
+driver_panis
+driver_pantano
+driver_papis
+driver_perez
+driver_petrov
+driver_piastri
+driver_pic
+driver_pietro_fittipaldi
+driver_piquet_jr
+driver_pizzonia
+driver_raikkonen
+driver_ralf_schumacher
+driver_ratzenberger
+driver_resta
+driver_ricciardo
+driver_rosa
+driver_rosberg
+driver_rosset
+driver_rossi
+driver_russell
+driver_sainz
+driver_salo
+driver_sargeant
+driver_sato
+driver_schiattarella
+driver_sirotkin
+driver_speed
+driver_stevens
+driver_stroll
+driver_sutil
+driver_suzuki
+driver_takagi
+driver_tarquini
+driver_trulli
+driver_tsunoda
+driver_tuero
+driver_vandoorne
+driver_vergne
+driver_verstappen
+driver_vettel
+driver_villeneuve
+driver_webber
+driver_wehrlein
+driver_wendlinger
+driver_wilson
+driver_wurz
+driver_yamamoto
+driver_zanardi
+driver_zhou
+driver_zonta
+team_AlphaTauri
+team_Alpine F1 Team
+team_Arrows
+team_Aston Martin
+team_BAR
+team_BMW Sauber
+team_Benetton
+team_Brawn
+team_Caterham
+team_Ferrari
+team_Footwork
+team_Force India
+team_Forti
+team_HRT
+team_Haas F1 Team
+team_Honda
+team_Jaguar
+team_Jordan
+team_Larrousse
+team_Ligier
+team_Lotus
+team_Lotus F1
+team_MF1
+team_Manor Marussia
+team_Marussia
+team_McLaren
+team_Mercedes
+team_Minardi
+team_Pacific
+team_Prost
+team_RB F1 Team
+team_Racing Point
+team_Red Bull
+team_Renault
+team_Sauber
+team_Simtek
+team_Spyker
+team_Spyker MF1
+team_Stewart
+team_Super Aguri
+team_Team Lotus
+team_Toro Rosso
+team_Toyota
+team_Tyrrell
+team_Virgin
+team_Williams
+track_Abu Dhabi Grand Prix
+track_Argentine Grand Prix
+track_Australian Grand Prix
+track_Austrian Grand Prix
+track_Azerbaijan Grand Prix
+track_Bahrain Grand Prix
+track_Belgian Grand Prix
+track_Brazilian Grand Prix
+track_British Grand Prix
+track_Canadian Grand Prix
+track_Chinese Grand Prix
+track_Dutch Grand Prix
+track_Eifel Grand Prix
+track_Emilia Romagna Grand Prix
+track_European Grand Prix
+track_French Grand Prix
+track_German Grand Prix
+track_Hungarian Grand Prix
+track_Indian Grand Prix
+track_Italian Grand Prix
+track_Japanese Grand Prix
+track_Korean Grand Prix
+track_Las Vegas Grand Prix
+track_Malaysian Grand Prix
+track_Mexican Grand Prix
+track_Mexico City Grand Prix
+track_Miami Grand Prix
+track_Monaco Grand Prix
+track_Pacific Grand Prix
+track_Portuguese Grand Prix
+track_Qatar Grand Prix
+track_Russian Grand Prix
+track_Sakhir Grand Prix
+track_San Marino Grand Prix
+track_Saudi Arabian Grand Prix
+track_Singapore Grand Prix
+track_Spanish Grand Prix
+track_Styrian Grand Prix
+track_São Paulo Grand Prix
+track_Turkish Grand Prix
+track_Tuscan Grand Prix
+track_United States Grand Prix
+nat_Argentine
+nat_Argentinian 
+nat_Australian
+nat_Austrian
+nat_Belgian
+nat_Brazilian
+nat_British
+nat_Canadian
+nat_Chinese
+nat_Colombian
+nat_Czech
+nat_Danish
+nat_Dutch
+nat_Finnish
+nat_French
+nat_German
+nat_Hungarian
+nat_Indian
+nat_Indonesian
+nat_Irish
+nat_Italian
+nat_Japanese
+nat_Mexican
+nat_Monegasque
+nat_New Zealander
+nat_Polish
+nat_Portuguese
+nat_Russian
+nat_Spanish
+nat_Swedish
+nat_Swiss
+nat_Thai
+nat_Venezuelan
+tracktype_street
