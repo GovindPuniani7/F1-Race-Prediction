@@ -298,28 +298,31 @@ elif page == "📡 Telemetry":
                                 if pd.isna(lap_d1['LapTime']) or pd.isna(lap_d2['LapTime']):
                                     st.error("One or both drivers did not set a valid fastest lap.")
                                 else:
+                                    # --- FINAL TELEMETRY FIX: Interpolate data for perfect alignment ---
                                     tel_d1 = lap_d1.get_car_data().add_distance()
                                     tel_d2 = lap_d2.get_car_data().add_distance()
+
+                                    # Use driver 1's distance as the common axis
+                                    distance_common = tel_d1['Distance']
                                     
-                                    # ✅ FINAL BUG FIX: Resample data for perfect alignment
-                                    tel_d2_resampled = tel_d2.copy()
-                                    tel_d2_resampled.index = tel_d1.index
-                                    merged_tel = pd.merge_asof(tel_d1, tel_d2_resampled, on='Time', direction='nearest')
+                                    # Interpolate driver 2's data onto the common distance axis
+                                    speed_d2_interp = np.interp(distance_common, tel_d2['Distance'], tel_d2['Speed'])
+                                    throttle_d2_interp = np.interp(distance_common, tel_d2['Distance'], tel_d2['Throttle'])
 
                                     color_d1 = f"#{session.results.loc[lap_d1['DriverNumber']]['TeamColor']}"
                                     color_d2 = f"#{session.results.loc[lap_d2['DriverNumber']]['TeamColor']}"
 
                                     fig, ax = plt.subplots(3, 1, figsize=(12, 9), sharex=True)
-                                    ax[0].plot(merged_tel['Distance_x'], merged_tel['Speed_x'], color=color_d1, label=driver1_abbr)
-                                    ax[0].plot(merged_tel['Distance_x'], merged_tel['Speed_y'], color=color_d2, label=driver2_abbr)
+                                    ax[0].plot(tel_d1['Distance'], tel_d1['Speed'], color=color_d1, label=driver1_abbr)
+                                    ax[0].plot(distance_common, speed_d2_interp, color=color_d2, label=driver2_abbr) # Plot interpolated data
                                     ax[0].set_ylabel('Speed (Km/h)'); ax[0].legend()
                                     
-                                    ax[1].plot(merged_tel['Distance_x'], merged_tel['Throttle_x'], color=color_d1, label=driver1_abbr)
-                                    ax[1].plot(merged_tel['Distance_x'], merged_tel['Throttle_y'], color=color_d2, label=driver2_abbr)
+                                    ax[1].plot(tel_d1['Distance'], tel_d1['Throttle'], color=color_d1, label=driver1_abbr)
+                                    ax[1].plot(distance_common, throttle_d2_interp, color=color_d2, label=driver2_abbr) # Plot interpolated data
                                     ax[1].set_ylabel('Throttle (%)')
 
-                                    delta_time, _, _ = fastf1.utils.delta_time(lap_d1, lap_d2)
-                                    ax[2].plot(tel_d1['Distance'], delta_time, color='white')
+                                    delta_time, ref_tel, _ = fastf1.utils.delta_time(lap_d1, lap_d2)
+                                    ax[2].plot(ref_tel['Distance'], delta_time, color='white')
                                     ax[2].axhline(0, color='grey', linestyle='--')
                                     ax[2].set_ylabel(f"Time Delta ({driver2_abbr} to {driver1_abbr})")
                                     
@@ -327,3 +330,4 @@ elif page == "📡 Telemetry":
                                     plt.close(fig)
                             except Exception as e:
                                 st.error(f"Could not process telemetry. Data might be incomplete. Error: {e}")
+
