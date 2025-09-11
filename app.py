@@ -1,3 +1,4 @@
+# app.py - Final, robust, and feature-complete Streamlit application
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -33,7 +34,6 @@ def load_assets():
         raise FileNotFoundError("Critical model or features file not found. Please re-run the training script and ensure all artifacts are in the repository.")
     
     model = joblib.load(model_path)
-    # The feature file has one column named 'feature'
     model_features_list = pd.read_csv(features_path)['feature'].tolist()
     
     metrics = {}
@@ -53,18 +53,15 @@ def create_prediction_features(inputs: dict, model_features_list: list, metrics:
         "position_qual": inputs.get("position_qual", 10),
         "year": inputs.get("year", 2023),
         "tracktype_street": 1 if inputs.get("track_type", "circuit") == "street" else 0,
-        "driver_form_5": metrics.get("driver_form_median", 10.0), # Use median from training as a fallback
+        "driver_form_5": metrics.get("driver_form_median", 10.0),
         "team_form_5": metrics.get("team_form_median", 10.0)
     }
     df = pd.DataFrame([base_features])
 
-    # One-hot encode categorical features, creating columns like 'driver_hamilton', 'team_Ferrari', etc.
     for prefix, value in [("driver", inputs.get("driver")), ("team", inputs.get("team")), ("track", inputs.get("track")), ("nat", inputs.get("nationality"))]:
         if value:
             df[f"{prefix}_{value}"] = 1
     
-    # Use .reindex() to perfectly align the DataFrame with the model's features.
-    # It ensures every column the model expects is present, in the correct order, and fills any missing ones with 0.
     final_df = df.reindex(columns=model_features_list, fill_value=0)
     return final_df
 
@@ -189,7 +186,6 @@ elif page == "🎯 Quick Prediction":
                         st.warning(f"Could not generate SHAP explanation. Error: {e}")
                 st.markdown("</div>", unsafe_allow_html=True)
 
-
 elif page == "📊 Insights & History":
     st.title("📊 Prediction History")
     hist_path = "predictions_history.csv"
@@ -215,7 +211,6 @@ elif page == "📊 Insights & History":
         st.dataframe(combined_logs)
     st.markdown("</div>", unsafe_allow_html=True)
 
-
 elif page == "📦 Batch Prediction":
     st.title("📦 Batch Prediction")
     st.markdown("<div class='card'><p>Upload a CSV with multiple scenarios to get predictions for all of them at once. The app will align the columns to the model's features.</p></div>", unsafe_allow_html=True)
@@ -228,11 +223,10 @@ elif page == "📦 Batch Prediction":
         with st.spinner("Processing batch file..."):
             try:
                 input_df = pd.read_csv(uploaded_file)
-                # Align to model features, filling missing with 0
                 aligned_df = input_df.reindex(columns=model_features_list, fill_value=0)
                 predictions = model.predict(aligned_df)
                 
-                results_df = input_df.copy() # Show user's original data
+                results_df = input_df.copy()
                 results_df["predicted_position"] = [round(p, 2) for p in predictions]
 
                 st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -241,7 +235,6 @@ elif page == "📦 Batch Prediction":
                 st.markdown("</div>", unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Failed to process batch file. Ensure it's a valid CSV. Error: {e}")
-
 
 elif page == "📡 Telemetry":
     st.title("📡 Telemetry Battle Mode")
@@ -256,7 +249,7 @@ elif page == "📡 Telemetry":
             try:
                 events = fastf1.events.get_event_schedule(year, include_testing=False)
                 gp = st.selectbox("Grand Prix", events['EventName'].tolist(), key="telemetry_gp")
-            except Exception as e:
+            except Exception:
                 st.warning(f"Could not load event schedule. API might be unavailable.")
                 gp = None
         with col3: session_type = st.selectbox("Session", ["Race", "Qualifying"], key="telemetry_session")
@@ -272,11 +265,11 @@ elif page == "📡 Telemetry":
                         session.load(laps=True, telemetry=False, weather=False, messages=False)
                         drivers_in_session = pd.unique(session.laps['Driver']).tolist()
                         if len(drivers_in_session) < 2:
-                            st.warning("Not enough driver data for comparison.")
+                            st.warning("Not enough driver data available for a comparison in this session.")
                         else:
                             st.session_state['session'] = session
                             st.session_state['drivers_in_session'] = drivers_in_session
-                            st.rerun() # Rerun to show driver select boxes
+                            st.rerun()
                     except Exception as e:
                         st.error(f"Failed to load session data. It may not be available. Error: {e}")
 
@@ -292,7 +285,7 @@ elif page == "📡 Telemetry":
                         with st.spinner(f"Loading telemetry..."):
                             try:
                                 session = st.session_state['session']
-                                session.load(telemetry=True, laps=True) # Ensure full data is loaded
+                                session.load(telemetry=True, laps=True)
                                 
                                 lap_d1 = session.laps.pick_driver(driver1_abbr).pick_fastest()
                                 lap_d2 = session.laps.pick_driver(driver2_abbr).pick_fastest()
@@ -303,8 +296,9 @@ elif page == "📡 Telemetry":
                                     tel_d1 = lap_d1.get_car_data().add_distance()
                                     tel_d2 = lap_d2.get_car_data().add_distance()
                                     
-                                    color_d1 = ff_plotting.team_color(lap_d1['Team'])
-                                    color_d2 = ff_plotting.team_color(lap_d2['Team'])
+                                    # ✅ FINAL BUG FIX: Use the correct method to get team color
+                                    color_d1 = f"#{session.results.loc[lap_d1['DriverNumber']]['TeamColor']}"
+                                    color_d2 = f"#{session.results.loc[lap_d2['DriverNumber']]['TeamColor']}"
 
                                     fig, ax = plt.subplots(3, 1, figsize=(12, 9), sharex=True)
                                     ax[0].plot(tel_d1['Distance'], tel_d1['Speed'], color=color_d1, label=driver1_abbr)
@@ -324,4 +318,3 @@ elif page == "📡 Telemetry":
                                     plt.close(fig)
                             except Exception as e:
                                 st.error(f"Could not process telemetry. Data might be incomplete. Error: {e}")
-
