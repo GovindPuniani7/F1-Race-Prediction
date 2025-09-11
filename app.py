@@ -82,6 +82,31 @@ def get_feature_explanation(feature_name, shap_value, selected_team, selected_ye
     
     return explanation
 
+def analyze_telemetry(lap_d1, lap_d2):
+    """Generates a markdown string with key insights from telemetry data."""
+    lap_time_diff = lap_d1['LapTime'] - lap_d2['LapTime']
+    faster_driver = lap_d1['Driver'] if lap_time_diff.total_seconds() < 0 else lap_d2['Driver']
+    
+    summary = f"#### Lap Analysis: {lap_d1['Driver']} vs {lap_d2['Driver']}\n"
+    summary += f"- **Overall Lap Time:** **{faster_driver}** was faster by **{abs(lap_time_diff.total_seconds()):.3f}** seconds.\n"
+    
+    tel_d1 = lap_d1.get_car_data()
+    tel_d2 = lap_d2.get_car_data()
+    
+    top_speed_d1 = tel_d1['Speed'].max()
+    top_speed_d2 = tel_d2['Speed'].max()
+    faster_top_speed_driver = lap_d1['Driver'] if top_speed_d1 > top_speed_d2 else lap_d2['Driver']
+    summary += f"- **Top Speed:** **{faster_top_speed_driver}** reached a higher top speed of **{max(top_speed_d1, top_speed_d2):.0f} km/h**.\n"
+
+    avg_speed_slow_corners_d1 = tel_d1[tel_d1['Speed'] < 150]['Speed'].mean()
+    avg_speed_slow_corners_d2 = tel_d2[tel_d2['Speed'] < 150]['Speed'].mean()
+    if not np.isnan(avg_speed_slow_corners_d1) and not np.isnan(avg_speed_slow_corners_d2):
+        faster_in_slow_corners = lap_d1['Driver'] if avg_speed_slow_corners_d1 > avg_speed_slow_corners_d2 else lap_d2['Driver']
+        summary += f"- **Slow Corners (<150 km/h):** **{faster_in_slow_corners}** maintained a higher average speed.\n"
+
+    return summary
+
+
 # ---------------- MAIN APP EXECUTION ----------------
 try:
     model, model_features_list, metrics = load_assets()
@@ -290,7 +315,7 @@ elif page == "📡 Telemetry":
                         with st.spinner(f"Loading telemetry..."):
                             try:
                                 session = st.session_state['session']
-                                session.load(telemetry=True, laps=True)
+                                session.load(telemetry=True, laps=True, weather=False, messages=False)
                                 
                                 lap_d1 = session.laps.pick_driver(driver1_abbr).pick_fastest()
                                 lap_d2 = session.laps.pick_driver(driver2_abbr).pick_fastest()
@@ -298,27 +323,19 @@ elif page == "📡 Telemetry":
                                 if pd.isna(lap_d1['LapTime']) or pd.isna(lap_d2['LapTime']):
                                     st.error("One or both drivers did not set a valid fastest lap.")
                                 else:
-                                    # --- FINAL TELEMETRY FIX: Interpolate data for perfect alignment ---
                                     tel_d1 = lap_d1.get_car_data().add_distance()
                                     tel_d2 = lap_d2.get_car_data().add_distance()
-
-                                    # Use driver 1's distance as the common axis
-                                    distance_common = tel_d1['Distance']
                                     
-                                    # Interpolate driver 2's data onto the common distance axis
-                                    speed_d2_interp = np.interp(distance_common, tel_d2['Distance'], tel_d2['Speed'])
-                                    throttle_d2_interp = np.interp(distance_common, tel_d2['Distance'], tel_d2['Throttle'])
-
                                     color_d1 = f"#{session.results.loc[lap_d1['DriverNumber']]['TeamColor']}"
                                     color_d2 = f"#{session.results.loc[lap_d2['DriverNumber']]['TeamColor']}"
 
                                     fig, ax = plt.subplots(3, 1, figsize=(12, 9), sharex=True)
                                     ax[0].plot(tel_d1['Distance'], tel_d1['Speed'], color=color_d1, label=driver1_abbr)
-                                    ax[0].plot(distance_common, speed_d2_interp, color=color_d2, label=driver2_abbr) # Plot interpolated data
+                                    ax[0].plot(tel_d2['Distance'], tel_d2['Speed'], color=color_d2, label=driver2_abbr)
                                     ax[0].set_ylabel('Speed (Km/h)'); ax[0].legend()
                                     
                                     ax[1].plot(tel_d1['Distance'], tel_d1['Throttle'], color=color_d1, label=driver1_abbr)
-                                    ax[1].plot(distance_common, throttle_d2_interp, color=color_d2, label=driver2_abbr) # Plot interpolated data
+                                    ax[1].plot(tel_d2['Distance'], tel_d2['Throttle'], color=color_d2, label=driver2_abbr)
                                     ax[1].set_ylabel('Throttle (%)')
 
                                     delta_time, ref_tel, _ = fastf1.utils.delta_time(lap_d1, lap_d2)
@@ -328,6 +345,12 @@ elif page == "📡 Telemetry":
                                     
                                     st.pyplot(fig)
                                     plt.close(fig)
+
+                                    # FINAL FEATURE: Add written analysis of the telemetry
+                                    st.markdown("<div class='card'>", unsafe_allow_html=True)
+                                    st.markdown(analyze_telemetry(lap_d1, lap_d2))
+                                    st.markdown("</div>", unsafe_allow_html=True)
+
                             except Exception as e:
                                 st.error(f"Could not process telemetry. Data might be incomplete. Error: {e}")
 
