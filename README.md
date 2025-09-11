@@ -1,4 +1,4 @@
-## F1 Race Position Predictor (Resume Project)
+## F1 Race Position Predictor 
 
 An end-to-end ML project that predicts a Formula 1 driver's final race position using qualifying results and contextual features (track type, team, year, nationality). It includes a Streamlit app with telemetry comparison, explainable predictions (SHAP), prediction history, and track advantage insights.
 
@@ -50,10 +50,11 @@ streamlit run app.py
 - Feature alignment: app uses `tracktype_street` to match training one-hot naming
 - Caching: FastF1 uses `f1_cache/` directory; first-time loads may take longer
 
-### Resume Highlights (copy-ready)
+### Resume Highlights
 - Built an end-to-end ML pipeline to predict F1 race finishing positions (RMSE printed after training)
 - Engineered categorical and contextual features; used XGBoost as the final model
 - Implemented explainable AI with SHAP: global summary and per-prediction explanations
 - Designed a Streamlit dashboard: telemetry comparison, interactive predictions, and insights
 - Persisted prediction history and created track advantage score analytics
+
 
