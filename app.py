@@ -1,4 +1,3 @@
-# app.py - Final, robust, and feature-complete Streamlit application
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -169,7 +168,7 @@ elif page == "🎯 Quick Prediction":
                         fig, ax = plt.subplots()
                         shap.plots.bar(shap_values[0], max_display=7, show=False)
                         st.pyplot(fig)
-                        plt.close(fig) # Memory leak fix
+                        plt.close(fig)
 
                         st.divider()
                         st.markdown("#### Key Factors Breakdown:")
@@ -188,6 +187,8 @@ elif page == "🎯 Quick Prediction":
 
 elif page == "📊 Insights & History":
     st.title("📊 Prediction History")
+    st.markdown("<div class='card'><p>Predictions made during your session are logged here. You can save the combined history to a CSV file in your repository.</p></div>", unsafe_allow_html=True)
+    
     hist_path = "predictions_history.csv"
     session_logs_df = pd.DataFrame(st.session_state["logs"])
     
@@ -199,8 +200,11 @@ elif page == "📊 Insights & History":
 
     if st.button("💾 Save Session History to File"):
         if not combined_logs.empty:
-            combined_logs.to_csv(hist_path, index=False)
-            st.success("History saved!")
+            try:
+                combined_logs.to_csv(hist_path, index=False)
+                st.success("History saved! It will be available in your GitHub repository after the next push.")
+            except Exception as e:
+                st.error(f"Could not save history file. Error: {e}")
         else:
             st.warning("No history to save.")
         
@@ -255,7 +259,7 @@ elif page == "📡 Telemetry":
         with col3: session_type = st.selectbox("Session", ["Race", "Qualifying"], key="telemetry_session")
 
         if gp and session_type:
-            if 'session' not in st.session_state or st.session_state.session.event['EventName'] != gp:
+            if 'session' not in st.session_state or st.session_state.get('session_key') != f"{year}-{gp}-{session_type}":
                 st.session_state.pop('drivers_in_session', None)
             
             if st.button("Load Drivers for Session"):
@@ -265,13 +269,14 @@ elif page == "📡 Telemetry":
                         session.load(laps=True, telemetry=False, weather=False, messages=False)
                         drivers_in_session = pd.unique(session.laps['Driver']).tolist()
                         if len(drivers_in_session) < 2:
-                            st.warning("Not enough driver data available for a comparison in this session.")
+                            st.warning("Not enough driver data for a comparison in this session.")
                         else:
                             st.session_state['session'] = session
+                            st.session_state['session_key'] = f"{year}-{gp}-{session_type}"
                             st.session_state['drivers_in_session'] = drivers_in_session
                             st.rerun()
                     except Exception as e:
-                        st.error(f"Failed to load session data. It may not be available. Error: {e}")
+                        st.error(f"Failed to load session data. It may not be available in the API. Error: {e}")
 
             if 'drivers_in_session' in st.session_state:
                 drivers = st.session_state['drivers_in_session']
@@ -296,17 +301,21 @@ elif page == "📡 Telemetry":
                                     tel_d1 = lap_d1.get_car_data().add_distance()
                                     tel_d2 = lap_d2.get_car_data().add_distance()
                                     
-                                    # ✅ FINAL BUG FIX: Use the correct method to get team color
+                                    # ✅ FINAL BUG FIX: Resample data for perfect alignment
+                                    tel_d2_resampled = tel_d2.copy()
+                                    tel_d2_resampled.index = tel_d1.index
+                                    merged_tel = pd.merge_asof(tel_d1, tel_d2_resampled, on='Time', direction='nearest')
+
                                     color_d1 = f"#{session.results.loc[lap_d1['DriverNumber']]['TeamColor']}"
                                     color_d2 = f"#{session.results.loc[lap_d2['DriverNumber']]['TeamColor']}"
 
                                     fig, ax = plt.subplots(3, 1, figsize=(12, 9), sharex=True)
-                                    ax[0].plot(tel_d1['Distance'], tel_d1['Speed'], color=color_d1, label=driver1_abbr)
-                                    ax[0].plot(tel_d2['Distance'], tel_d2['Speed'], color=color_d2, label=driver2_abbr)
+                                    ax[0].plot(merged_tel['Distance_x'], merged_tel['Speed_x'], color=color_d1, label=driver1_abbr)
+                                    ax[0].plot(merged_tel['Distance_x'], merged_tel['Speed_y'], color=color_d2, label=driver2_abbr)
                                     ax[0].set_ylabel('Speed (Km/h)'); ax[0].legend()
                                     
-                                    ax[1].plot(tel_d1['Distance'], tel_d1['Throttle'], color=color_d1, label=driver1_abbr)
-                                    ax[1].plot(tel_d2['Distance'], tel_d2['Throttle'], color=color_d2, label=driver2_abbr)
+                                    ax[1].plot(merged_tel['Distance_x'], merged_tel['Throttle_x'], color=color_d1, label=driver1_abbr)
+                                    ax[1].plot(merged_tel['Distance_x'], merged_tel['Throttle_y'], color=color_d2, label=driver2_abbr)
                                     ax[1].set_ylabel('Throttle (%)')
 
                                     delta_time, _, _ = fastf1.utils.delta_time(lap_d1, lap_d2)
