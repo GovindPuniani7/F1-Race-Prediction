@@ -3,6 +3,7 @@ position_qual
 year
 driver_form_5
 team_form_5
+driver_adams
 driver_aitken
 driver_albers
 driver_albon
@@ -165,6 +166,7 @@ driver_yamamoto
 driver_zanardi
 driver_zhou
 driver_zonta
+team_Alfa Romeo
 team_AlphaTauri
 team_Alpine F1 Team
 team_Arrows
@@ -211,6 +213,7 @@ team_Toyota
 team_Tyrrell
 team_Virgin
 team_Williams
+track_70th Anniversary Grand Prix
 track_Abu Dhabi Grand Prix
 track_Argentine Grand Prix
 track_Australian Grand Prix
@@ -253,6 +256,7 @@ track_São Paulo Grand Prix
 track_Turkish Grand Prix
 track_Tuscan Grand Prix
 track_United States Grand Prix
+nat_American
 nat_Argentine
 nat_Argentinian 
 nat_Australian
@@ -286,4 +290,5 @@ nat_Swedish
 nat_Swiss
 nat_Thai
 nat_Venezuelan
+tracktype_circuit
 tracktype_street
