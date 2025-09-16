@@ -2,6 +2,8 @@
 
 An end-to-end ML project that predicts a Formula 1 driver's final race position using qualifying results and contextual features (track type, team, year, nationality). It includes a Streamlit app with telemetry comparison, explainable predictions (SHAP), prediction history, and track advantage insights.
 
+Live Demo:https://f1-race-prediction.streamlit.app/
+
 ### Features
 - End-to-end pipeline: data merge, feature engineering, train/test split, XGBoost model
 - SHAP summary during training, plus per-prediction explanation in the app
